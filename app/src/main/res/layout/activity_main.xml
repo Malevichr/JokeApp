@@ -19,11 +19,12 @@
 
         />
     <ProgressBar
+        android:indeterminate="true"
         android:id="@+id/progressBar"
         android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        style="?android:attr/progressBarStyleHorizontal"
        />
     <Button
         android:id="@+id/button"
@@ -32,5 +33,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         />
+
 
 </LinearLayout>

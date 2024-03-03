@@ -12,14 +12,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        var x = 0
+
+        viewModel = (application as JokeApp).viewModel
+
         binding.button.setOnClickListener {
             binding.button.isEnabled = false
             binding.progressBar.visibility = View.VISIBLE
             viewModel.getJoke()
         }
         viewModel.init(object: TextCallback{
-            override fun provideText(text: String){
+            override fun provideText(text: String) = runOnUiThread{
                 binding.button.isEnabled = true
                 binding.progressBar.visibility = View.INVISIBLE
                 binding.textView.text = text
