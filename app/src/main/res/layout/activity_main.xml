@@ -16,7 +16,7 @@
         android:gravity="center"
         android:layout_margin="8dp"
         tools:text = "Some joke here"
-
+        android:layout_weight="10"
         />
     <ProgressBar
         android:indeterminate="true"

@@ -2,23 +2,25 @@ package com.example.jokeapp
 
 import android.provider.ContactsContract.Data
 
-class MainViewModel(private val model: Model<Any, Any>) {
+class MainViewModel(private val model: Model<Joke, Error>) {
     private var textCallback: TextCallback = TextCallback.Empty()
+    private val resultCallback = object: ResultCallback<Joke, Error>{
+        override fun provideSuccess(data: Joke) {
+            textCallback.provideText(data.toUi())
+        }
+
+        override fun provideError(error: Error) {
+            textCallback.provideText(error.message())
+        }
+    }
     fun getJoke() {
         model.fetch()
     }
 
     fun init(textCallback: TextCallback) {
         this.textCallback = textCallback
-        model.init(object: ResultCallback<Any, Any>{
-            override fun provideSuccess(data: Any) {
-                textCallback.provideText("success")
-            }
 
-            override fun provideError(error: Any) {
-                textCallback.provideText("error")
-            }
-        })
+        model.init(resultCallback)
     }
 
     fun clear() {
