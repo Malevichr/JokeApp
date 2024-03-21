@@ -2,6 +2,7 @@ package com.example.jokeapp
 
 import com.google.gson.annotations.SerializedName
 
+
 data class JokeCloud(
     @SerializedName("categories")
     private val category: Array<Any>,
@@ -18,5 +19,5 @@ data class JokeCloud(
     @SerializedName("value")
     private val value: String
 ){
-    fun toJoke() = value
+    fun toJoke() = Joke(value)
 }

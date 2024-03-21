@@ -7,16 +7,33 @@
     android:orientation="vertical"
     android:gravity="center"
     tools:context=".MainActivity">
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/languageMenu"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/langguage">
 
+        <AutoCompleteTextView
+            android:id="@+id/languageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:text="@string/english"
+            app:simpleItems="@array/language_items"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
     <TextView
         android:id="@+id/textView"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:gravity="center"
         android:layout_margin="8dp"
         tools:text = "Some joke here"
         android:layout_weight="10"
+        android:freezesText="true"
         />
     <ProgressBar
         android:indeterminate="true"
@@ -33,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         />
+
 
 
 </LinearLayout>

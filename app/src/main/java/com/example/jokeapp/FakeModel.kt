@@ -14,7 +14,7 @@ class FakeModel(
         Timer().schedule(object: TimerTask(){
             override fun run() {
                 if (count % 3 == 1){
-                    resultCallback?.provideSuccess(Joke("fake joke $count", "punchLine"))
+                    resultCallback?.provideSuccess(Joke("fake joke $count"))
                 }
                 else if (count % 3 == 2)
                     resultCallback?.provideError(noConnection)

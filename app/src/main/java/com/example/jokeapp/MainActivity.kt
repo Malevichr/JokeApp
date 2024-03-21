@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         binding.button.setOnClickListener {
             binding.button.isEnabled = false
             binding.progressBar.visibility = View.VISIBLE
-            viewModel.getJoke()
+            viewModel.getJoke(binding.languageView.text.toString())
         }
         viewModel.init(object: TextCallback{
             override fun provideText(text: String) = runOnUiThread{

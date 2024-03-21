@@ -1,6 +1,5 @@
 package com.example.jokeapp
 
-import android.provider.ContactsContract.Data
 
 class MainViewModel(private val model: Model<Joke, Error>) {
     private var textCallback: TextCallback = TextCallback.Empty()
@@ -13,13 +12,12 @@ class MainViewModel(private val model: Model<Joke, Error>) {
             textCallback.provideText(error.message())
         }
     }
-    fun getJoke() {
+    fun getJoke(language: String) {
         model.fetch()
     }
 
     fun init(textCallback: TextCallback) {
         this.textCallback = textCallback
-
         model.init(resultCallback)
     }
 
