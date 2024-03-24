@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    tools:context=".presentation.MainActivity">
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/languageMenu"
         style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
@@ -20,37 +21,49 @@
             android:layout_height="wrap_content"
             android:inputType="none"
             android:text="@string/english"
-            app:simpleItems="@array/language_items"
-            />
-
+            app:simpleItems="@array/language_items" />
     </com.google.android.material.textfield.TextInputLayout>
+
+
     <TextView
         android:id="@+id/textView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="center"
-        android:layout_margin="8dp"
-        tools:text = "Some joke here"
-        android:layout_weight="10"
+        android:layout_height = "0dp"
+        android:layout_weight="1"
         android:freezesText="true"
-        />
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        tools:text="Some joke here"/>
+
+
+    <ImageButton
+        android:id="@+id/favoriteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="#0000"
+        tools:src="@drawable/ic_favorite_filled_48" />
+
     <ProgressBar
-        android:indeterminate="true"
         android:id="@+id/progressBar"
-        android:visibility="invisible"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="?android:attr/progressBarStyleHorizontal"
-       />
+        android:indeterminate="true"
+        android:visibility="invisible" />
+
+    <CheckBox
+        android:id="@+id/showFavoriteCheckBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/from_favorites" />
+
     <Button
         android:id="@+id/button"
-        android:text="@string/get_joke"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        />
-
+        android:text="@string/get_joke" />
 
 
 </LinearLayout>

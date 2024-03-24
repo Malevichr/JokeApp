@@ -7,4 +7,6 @@
     <string name="english">English</string>
     <string name="russian">Russian</string>
     <string name="chuvash">Chuvash</string>
+    <string name="from_favorites">From favorites</string>
+    <string name="no_favorite_jokes">No favorite jokes.</string>
 </resources>

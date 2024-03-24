@@ -1,11 +1,13 @@
-package com.example.jokeapp
+package com.example.jokeapp.data.cloud
 
+import com.example.jokeapp.data.cloud.cache.CacheDataSource
+import com.example.jokeapp.presentation.JokeUi
 import com.google.gson.annotations.SerializedName
 
 
 data class JokeCloud(
     @SerializedName("categories")
-    private val category: Array<Any>,
+    private val category: Array<Int>,
     @SerializedName("created_at")
     private val created_at: String,
     @SerializedName("icon_url")
@@ -19,5 +21,8 @@ data class JokeCloud(
     @SerializedName("value")
     private val value: String
 ){
-    fun toJoke() = Joke(value)
+    fun toUi() = JokeUi.Base(value)
+    fun toUiFavorite() = JokeUi.Favorite(value)
+    fun change(cacheDataSource: CacheDataSource): JokeUi =
+        cacheDataSource.addOrRemove(id, this)
 }

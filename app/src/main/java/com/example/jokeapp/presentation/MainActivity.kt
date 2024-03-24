@@ -1,8 +1,9 @@
-package com.example.jokeapp
+package com.example.jokeapp.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.example.jokeapp.JokeApp
 import com.example.jokeapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -15,16 +16,28 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = (application as JokeApp).viewModel
 
+        binding.showFavoriteCheckBox.setOnCheckedChangeListener{_, isChecked ->
+            viewModel.chooseFavorites(isChecked)
+
+        }
+        binding.favoriteButton.setOnClickListener{
+            viewModel.changeJokeStatus()
+        }
+
         binding.button.setOnClickListener {
             binding.button.isEnabled = false
             binding.progressBar.visibility = View.VISIBLE
-            viewModel.getJoke(binding.languageView.text.toString())
+            viewModel.getJoke()
         }
-        viewModel.init(object: TextCallback{
+        viewModel.init(object: JokeUiCallback {
             override fun provideText(text: String) = runOnUiThread{
                 binding.button.isEnabled = true
                 binding.progressBar.visibility = View.INVISIBLE
                 binding.textView.text = text
+            }
+
+            override fun provideIconResId(iconResId: Int) = runOnUiThread {
+                binding.favoriteButton.setImageResource(iconResId)
             }
         })
     }

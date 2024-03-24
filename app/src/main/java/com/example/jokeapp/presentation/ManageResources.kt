@@ -1,14 +1,13 @@
-package com.example.jokeapp
+package com.example.jokeapp.presentation
 
 import android.content.Context
 import androidx.annotation.StringRes
 
 interface ManageResources {
     fun string(@StringRes resourceId: Int): String
-    class Base(private val context: Context) : ManageResources{
+    class Base(private val context: Context) : ManageResources {
         override fun string(resourceId: Int): String {
             return context.getString(resourceId)
         }
-
     }
 }
