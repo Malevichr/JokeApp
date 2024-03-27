@@ -1,7 +1,6 @@
 package com.example.jokeapp.data
 
 import com.example.jokeapp.presentation.JokeUi
-import com.example.jokeapp.presentation.JokeUiCallback
 
 
 interface Repository<S, E> {

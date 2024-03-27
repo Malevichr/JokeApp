@@ -1,7 +1,11 @@
-package com.example.jokeapp.data.cloud.cache
+package com.example.jokeapp.data.cache
 
 import com.example.jokeapp.data.Error
-import com.example.jokeapp.data.cloud.JokeCloud
+import com.example.jokeapp.data.Joke
+import com.example.jokeapp.data.ToBaseUi
+import com.example.jokeapp.data.ToCache
+import com.example.jokeapp.data.ToFavoriteUi
+import com.example.jokeapp.data.cloud.JokeCallback
 import com.example.jokeapp.presentation.JokeUi
 import com.example.jokeapp.presentation.ManageResources
 import io.realm.kotlin.Realm
@@ -9,8 +13,8 @@ import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 
 interface CacheDataSource {
-    fun addOrRemove(id: String, joke: JokeCloud): JokeUi
-    fun fetch(jokeCacheCallback: JokeCacheCallback)
+    fun addOrRemove(id: String, joke: Joke): JokeUi
+    fun fetch(jokeCallback: JokeCallback)
     class Base(
         private val realmConfiguration: RealmConfiguration,
         manageResources: ManageResources
@@ -19,7 +23,7 @@ interface CacheDataSource {
             Error.NoFavoriteJoke(manageResources)
         }
 
-        override fun addOrRemove(id: String, joke: JokeCloud): JokeUi {
+        override fun addOrRemove(id: String, joke: Joke): JokeUi {
             val realm = Realm.open(realmConfiguration)
 
 
@@ -29,24 +33,24 @@ interface CacheDataSource {
                     findLatest(jokeCache)?.also { delete(it) }
                 }
                 realm.close()
-                joke.toUi()
+                joke.map(ToBaseUi())
             } catch (_: Exception) {
                 realm.writeBlocking {
-                    copyToRealm(joke.toCache())
+                    copyToRealm(joke.map(ToCache()))
                 }
                 realm.close()
-                joke.toUiFavorite()
+                joke.map(ToFavoriteUi())
             }
         }
 
-        override fun fetch(jokeCacheCallback: JokeCacheCallback) {
+        override fun fetch(jokeCallback: JokeCallback) {
             val realm = Realm.open(realmConfiguration)
             try {
                 val jokesCached = realm.query<JokeCache>().find()
-                val r = jokesCached.random()
-                jokeCacheCallback.provideJoke(JokeCloud(r.id, r.text))
+                val randomeJokeCached = jokesCached.random()
+                jokeCallback.provideJoke(randomeJokeCached)
             } catch (_: Exception) {
-                jokeCacheCallback.provideError(error)
+                jokeCallback.provideError(error)
             }
         }
 
@@ -56,30 +60,27 @@ interface CacheDataSource {
         private val error: Error by lazy {
             Error.NoFavoriteJoke(manageResources)
         }
-        private val map = mutableMapOf<String, JokeCloud>()
-        override fun addOrRemove(id: String, joke: JokeCloud): JokeUi {
+        private val map = mutableMapOf<String, Joke>()
+        override fun addOrRemove(id: String, joke: Joke): JokeUi {
             return if (map.containsKey(id)) {
                 map.remove(id)
-                joke.toUi()
+                joke.map(ToBaseUi())
             } else {
                 map[id] = joke
-                joke.toUiFavorite()
+                joke.map(ToFavoriteUi())
             }
         }
 
-        override fun fetch(jokeCacheCallback: JokeCacheCallback) {
+        override fun fetch(jokeCallback: JokeCallback) {
             if (map.isEmpty()) {
-                jokeCacheCallback.provideError(error)
+                jokeCallback.provideError(error)
             } else
-                jokeCacheCallback.provideJoke(map.toList()[(0 until (map.size)).random()].second)
+                jokeCallback.provideJoke(map.toList()[(0 until (map.size)).random()].second)
         }
     }
 }
 
-interface JokeCacheCallback : ProvideError {
-    fun provideJoke(joke: JokeCloud)
 
-}
 
 interface ProvideError {
     fun provideError(error: Error)

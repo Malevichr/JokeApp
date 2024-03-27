@@ -6,8 +6,8 @@ import com.example.jokeapp.data.BaseRepository
 import com.example.jokeapp.data.FakeRepository
 import com.example.jokeapp.data.cloud.CloudDataSource
 import com.example.jokeapp.data.cloud.JokeService
-import com.example.jokeapp.data.cloud.cache.CacheDataSource
-import com.example.jokeapp.data.cloud.cache.JokeCache
+import com.example.jokeapp.data.cache.CacheDataSource
+import com.example.jokeapp.data.cache.JokeCache
 import com.example.jokeapp.presentation.MainViewModel
 import com.example.jokeapp.presentation.ManageResources
 import io.realm.kotlin.Configuration
@@ -47,8 +47,7 @@ class JokeApp : Application() {
                     retrofit.create(JokeService::class.java),
                     manageResources
                 ),
-                CacheDataSource.Base(realmConfiguration, manageResources),
-                manageResources
+                CacheDataSource.Base(realmConfiguration, manageResources)
             )
         )
     }

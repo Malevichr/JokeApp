@@ -32,7 +32,7 @@ class FakeRepository(
         TODO("Not yet implemented")
     }
 
-    override fun init(resultCallback: ResultCallback<JokeUi, Error>) {
-        callback = resultCallback
+    override fun init(callback: ResultCallback<JokeUi, Error>) {
+        this.callback = callback
     }
 }

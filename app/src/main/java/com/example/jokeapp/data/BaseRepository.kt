@@ -1,26 +1,22 @@
 package com.example.jokeapp.data
 
 import com.example.jokeapp.data.cloud.CloudDataSource
-import com.example.jokeapp.data.cloud.JokeCloud
-import com.example.jokeapp.data.cloud.JokeCloudCallback
-import com.example.jokeapp.data.cloud.cache.CacheDataSource
-import com.example.jokeapp.data.cloud.cache.JokeCacheCallback
+import com.example.jokeapp.data.cloud.JokeCallback
+import com.example.jokeapp.data.cache.CacheDataSource
 import com.example.jokeapp.presentation.JokeUi
-import com.example.jokeapp.presentation.ManageResources
 
 class BaseRepository(
     private val cloudDataSource: CloudDataSource,
-    private val cacheDataSource: CacheDataSource,
-    private val manageResources: ManageResources
+    private val cacheDataSource: CacheDataSource
 ) : Repository<JokeUi, Error> {
     private var callback: ResultCallback<JokeUi, Error>? = null
-    private var jokeCloudTemprorary: JokeCloud? = null
+    private var jokeTemrorary: Joke? = null
     override fun fetch() {
         if (getJokeFromCache){
-            cacheDataSource.fetch(object : JokeCacheCallback{
-                override fun provideJoke(joke: JokeCloud) {
-                    jokeCloudTemprorary = joke
-                    callback?.provideSuccess(joke.toUiFavorite())
+            cacheDataSource.fetch(object : JokeCallback {
+                override fun provideJoke(joke: Joke) {
+                    jokeTemrorary = joke
+                    callback?.provideSuccess(joke.map(ToFavoriteUi()))
                 }
 
                 override fun provideError(error: Error) {
@@ -29,14 +25,15 @@ class BaseRepository(
 
             })
         }else {
-            cloudDataSource.fetch(object : JokeCloudCallback {
-                override fun provideJokeSuccess(jokeCloud: JokeCloud) {
-                    jokeCloudTemprorary = jokeCloud
-                    callback?.provideSuccess(jokeCloud.toUi())
+            cloudDataSource.fetch(object :
+                com.example.jokeapp.data.cloud.JokeCallback {
+                override fun provideJoke(joke: Joke) {
+                    jokeTemrorary = joke
+                    callback?.provideSuccess(joke.map(ToBaseUi()))
                 }
 
                 override fun provideError(error: Error) {
-                    jokeCloudTemprorary = null
+                    jokeTemrorary = null
                     callback?.provideError(error)
                 }
 
@@ -50,8 +47,8 @@ class BaseRepository(
     }
 
     override fun changeJokeStatus(resultCallback: ResultCallback<JokeUi, Error>) {
-        jokeCloudTemprorary?.let {
-            resultCallback.provideSuccess(it.change(cacheDataSource))
+        jokeTemrorary?.let {
+            resultCallback.provideSuccess(it.map(Change(cacheDataSource)))
         }
     }
     private var getJokeFromCache = false
@@ -59,7 +56,7 @@ class BaseRepository(
         getJokeFromCache = favorite
     }
 
-    override fun init(resultCallback: ResultCallback<JokeUi, Error>) {
-        callback = resultCallback
+    override fun init(callback: ResultCallback<JokeUi, Error>) {
+        this.callback = callback
     }
 }

@@ -1,8 +1,6 @@
 package com.example.jokeapp.data.cloud
 
-import com.example.jokeapp.data.cloud.cache.CacheDataSource
-import com.example.jokeapp.data.cloud.cache.JokeCache
-import com.example.jokeapp.presentation.JokeUi
+import com.example.jokeapp.data.Joke
 import com.google.gson.annotations.SerializedName
 
 
@@ -20,18 +18,8 @@ data class JokeCloud(
     @SerializedName("url")
     private val url: String,
     @SerializedName("value")
-    private val value: String
-){
-    constructor(id: String, text:String):
-            this(arrayOf(""),"","",id, "","",text)
-    fun toUi() = JokeUi.Base(value)
-    fun toUiFavorite() = JokeUi.Favorite(value)
-    fun change(cacheDataSource: CacheDataSource): JokeUi =
-        cacheDataSource.addOrRemove(id, this)
-    fun toCache(): JokeCache{
-        val jokeCache = JokeCache()
-        jokeCache.id = id
-        jokeCache.text = value
-        return jokeCache
-    }
+    private val text: String
+) : Joke {
+    override fun <T> map(mapper: Joke.Mapper<T>): T = mapper.map(id, text)
+
 }
