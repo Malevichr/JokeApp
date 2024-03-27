@@ -30,6 +30,7 @@ class MainViewModel(private val repository: Repository<JokeUi, Error>) {
     }
 }
 
+
 interface JokeUiCallback {
     fun provideText(text: String)
     fun provideIconResId(iconResId: Int)

@@ -19,6 +19,7 @@ class BaseRepository(
         if (getJokeFromCache){
             cacheDataSource.fetch(object : JokeCacheCallback{
                 override fun provideJoke(joke: JokeCloud) {
+                    jokeCloudTemprorary = joke
                     callback?.provideSuccess(joke.toUiFavorite())
                 }
 
