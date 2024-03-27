@@ -7,38 +7,31 @@ import com.example.jokeapp.presentation.JokeUi
 
 class BaseRepository(
     private val cloudDataSource: CloudDataSource,
-    private val cacheDataSource: CacheDataSource
+    private val cacheDataSource: CacheDataSource,
+    private val toFavorite: ToFavoriteUi = ToFavoriteUi(),
+    private val toBaseUi: ToBaseUi = ToBaseUi()
 ) : Repository<JokeUi, Error> {
     private var callback: ResultCallback<JokeUi, Error>? = null
     private var jokeTemrorary: Joke? = null
+
     override fun fetch() {
         if (getJokeFromCache){
-            cacheDataSource.fetch(object : JokeCallback {
-                override fun provideJoke(joke: Joke) {
-                    jokeTemrorary = joke
-                    callback?.provideSuccess(joke.map(ToFavoriteUi()))
-                }
-
-                override fun provideError(error: Error) {
-                    callback?.provideError(error)
-                }
-
-            })
+            cacheDataSource.fetch(BaseJokeCallback(toFavorite))
         }else {
-            cloudDataSource.fetch(object :
-                com.example.jokeapp.data.cloud.JokeCallback {
-                override fun provideJoke(joke: Joke) {
-                    jokeTemrorary = joke
-                    callback?.provideSuccess(joke.map(ToBaseUi()))
-                }
-
-                override fun provideError(error: Error) {
-                    jokeTemrorary = null
-                    callback?.provideError(error)
-                }
-
-            })
+            cloudDataSource.fetch(BaseJokeCallback(toBaseUi))
         }
+    }
+    private inner class BaseJokeCallback(private val mapper: Joke.Mapper<JokeUi>): JokeCallback{
+        override fun provideJoke(joke: Joke) {
+            jokeTemrorary = joke
+            callback?.provideSuccess(joke.map(mapper))
+        }
+
+        override fun provideError(error: Error) {
+            jokeTemrorary = null
+            callback?.provideError(error)
+        }
+
     }
 
 
@@ -59,4 +52,7 @@ class BaseRepository(
     override fun init(callback: ResultCallback<JokeUi, Error>) {
         this.callback = callback
     }
+}
+interface DataSource{
+    fun fetch(jokeCallback: JokeCallback)
 }

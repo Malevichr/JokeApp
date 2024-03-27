@@ -1,5 +1,6 @@
 package com.example.jokeapp.data.cloud
 
+import com.example.jokeapp.data.DataSource
 import com.example.jokeapp.data.Error
 import com.example.jokeapp.data.Joke
 import com.example.jokeapp.data.cache.ProvideError
@@ -9,8 +10,8 @@ import retrofit2.Response
 import java.net.ConnectException
 import java.net.UnknownHostException
 
-interface CloudDataSource {
-    fun fetch(cloudCallback: JokeCallback)
+interface CloudDataSource: DataSource {
+    override fun fetch(jokeCallback: JokeCallback)
     class Base(
         private val jokeService: JokeService,
         private val manageResources: ManageResources
@@ -22,22 +23,22 @@ interface CloudDataSource {
             Error.ServiceUnavailable(manageResources)
         }
 
-        override fun fetch(cloudCallback: JokeCallback) {
+        override fun fetch(jokeCallback: JokeCallback) {
 
             jokeService.joke().enqueue(object : retrofit2.Callback<JokeCloud> {
                 override fun onResponse(call: Call<JokeCloud>, response: Response<JokeCloud>) {
                     if (response.isSuccessful) {
                         val body = response.body()
                         if (body != null)
-                            cloudCallback.provideJoke(body)
+                            jokeCallback.provideJoke(body)
                         else
-                            cloudCallback.provideError(serviceError)
+                            jokeCallback.provideError(serviceError)
                     } else
-                        cloudCallback.provideError(serviceError)
+                        jokeCallback.provideError(serviceError)
                 }
 
                 override fun onFailure(call: Call<JokeCloud>, t: Throwable) {
-                    cloudCallback.provideError(
+                    jokeCallback.provideError(
                         if (t is UnknownHostException || t is ConnectException)
                             noConnection
                         else

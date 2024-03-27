@@ -1,5 +1,6 @@
 package com.example.jokeapp.data.cache
 
+import com.example.jokeapp.data.DataSource
 import com.example.jokeapp.data.Error
 import com.example.jokeapp.data.Joke
 import com.example.jokeapp.data.ToBaseUi
@@ -12,9 +13,9 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 
-interface CacheDataSource {
+interface CacheDataSource: DataSource {
     fun addOrRemove(id: String, joke: Joke): JokeUi
-    fun fetch(jokeCallback: JokeCallback)
+    override fun fetch(jokeCallback: JokeCallback)
     class Base(
         private val realmConfiguration: RealmConfiguration,
         manageResources: ManageResources
@@ -55,6 +56,7 @@ interface CacheDataSource {
         }
 
     }
+
 
     class Fake(manageResources: ManageResources) : CacheDataSource {
         private val error: Error by lazy {
