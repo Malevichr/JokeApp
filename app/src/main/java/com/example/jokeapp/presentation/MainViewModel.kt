@@ -1,32 +1,52 @@
 package com.example.jokeapp.presentation
 
-import com.example.jokeapp.data.Repository
-import com.example.jokeapp.data.ResultCallback
 import com.example.jokeapp.data.Error
+import com.example.jokeapp.data.Repository
+import com.example.jokeapp.data.ToBaseUi
+import com.example.jokeapp.data.ToFavoriteUi
 
 
-class MainViewModel(private val repository: Repository<JokeUi, Error>) {
+class MainViewModel(
+    private val repository: Repository<JokeUi, Error>,
+    private val toFavorite: ToFavoriteUi = ToFavoriteUi(),
+    private val toBaseUi: ToBaseUi = ToBaseUi()
+) {
     private var jokeUiCallback: JokeUiCallback = JokeUiCallback.Empty()
-    private val resultCallback = object : ResultCallback<JokeUi, Error> {
-        override fun provideSuccess(data: JokeUi) = data.show(jokeUiCallback)
-        override fun provideError(error: Error) = JokeUi.Failed(error.message()).show(jokeUiCallback)
-    }
+
     fun getJoke() {
-        repository.fetch()
+        Thread {
+            val result = repository.fetch()
+            if (result.isSuccessful()) {
+                if (result.isFavorite())
+                    result.map(toFavorite).show(jokeUiCallback)
+                else
+                    result.map(toBaseUi).show(jokeUiCallback)
+            } else {
+                JokeUi.Failed(result.errorMessage()).show(jokeUiCallback)
+            }
+        }.start()
     }
+
     fun init(jokeUiCallback: JokeUiCallback) {
         this.jokeUiCallback = jokeUiCallback
-        repository.init(resultCallback)
     }
+
     fun clear() {
         jokeUiCallback = JokeUiCallback.Empty()
-        repository.clear()
     }
+
     fun chooseFavorites(favorites: Boolean) {
         repository.chooseFavorites(favorites)
     }
+
     fun changeJokeStatus() {
-        repository.changeJokeStatus(resultCallback)
+        Thread{
+            val result = repository.changeJokeStatus()
+            if(result.isFavorite())
+                result.map(toFavorite).show(jokeUiCallback)
+            else
+                result.map(toBaseUi).show(jokeUiCallback)
+        }.start()
     }
 }
 

@@ -38,14 +38,15 @@ class ToFavoriteUi : Joke.Mapper<JokeUi> {
 }
 
 class Change(
-    private val cacheDataSource: CacheDataSource
-) : Joke.Mapper<JokeUi> {
-    override fun map(id: String, text: String): JokeUi =
-        cacheDataSource.addOrRemove(id, JokeDomain(id, text))
+    private val cacheDataSource: CacheDataSource,
+    private val toDomain: Joke.Mapper<JokeDomain> = ToDomain()
+) : Joke.Mapper<JokeResult> {
+    override fun map(id: String, text: String): JokeResult =
+        cacheDataSource.addOrRemove(id, toDomain.map(id, text))
 }
 
-class ToDomain : Joke.Mapper<Joke> {
-    override fun map(id: String, text: String): Joke {
+class ToDomain : Joke.Mapper<JokeDomain> {
+    override fun map(id: String, text: String): JokeDomain {
         return JokeDomain(id, text)
     }
 
