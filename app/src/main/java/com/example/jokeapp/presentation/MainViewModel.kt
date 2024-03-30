@@ -1,52 +1,63 @@
 package com.example.jokeapp.presentation
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.jokeapp.data.Error
 import com.example.jokeapp.data.Repository
 import com.example.jokeapp.data.ToBaseUi
 import com.example.jokeapp.data.ToFavoriteUi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MainViewModel(
     private val repository: Repository<JokeUi, Error>,
     private val toFavorite: ToFavoriteUi = ToFavoriteUi(),
     private val toBaseUi: ToBaseUi = ToBaseUi()
-) {
+):ViewModel() {
     private var jokeUiCallback: JokeUiCallback = JokeUiCallback.Empty()
-
     fun getJoke() {
-        Thread {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = repository.fetch()
-            if (result.isSuccessful()) {
+            val ui = if (result.isSuccessful()) {
                 if (result.isFavorite())
-                    result.map(toFavorite).show(jokeUiCallback)
+                    result.map(toFavorite)
                 else
-                    result.map(toBaseUi).show(jokeUiCallback)
+                    result.map(toBaseUi)
             } else {
-                JokeUi.Failed(result.errorMessage()).show(jokeUiCallback)
+                JokeUi.Failed(result.errorMessage())
             }
-        }.start()
+            withContext(Dispatchers.Main){
+                ui.show(jokeUiCallback)
+            }
+        }
     }
 
     fun init(jokeUiCallback: JokeUiCallback) {
         this.jokeUiCallback = jokeUiCallback
     }
 
-    fun clear() {
+    override fun onCleared() {
+        super.onCleared()
         jokeUiCallback = JokeUiCallback.Empty()
     }
-
     fun chooseFavorites(favorites: Boolean) {
         repository.chooseFavorites(favorites)
     }
 
     fun changeJokeStatus() {
-        Thread{
+        viewModelScope.launch(Dispatchers.IO) {
             val result = repository.changeJokeStatus()
-            if(result.isFavorite())
-                result.map(toFavorite).show(jokeUiCallback)
+            val job = if(result.isFavorite())
+                result.map(toFavorite)
             else
-                result.map(toBaseUi).show(jokeUiCallback)
-        }.start()
+                result.map(toBaseUi)
+
+            withContext(Dispatchers.Main){
+                job.show(jokeUiCallback)
+            }
+        }
     }
 }
 

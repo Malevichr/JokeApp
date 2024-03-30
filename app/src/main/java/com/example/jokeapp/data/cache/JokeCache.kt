@@ -8,5 +8,5 @@ open class JokeCache(): RealmObject, Joke {
     @PrimaryKey
     var id: String = ""
     var text: String = ""
-    override fun <T> map(mapper: Joke.Mapper<T>): T = mapper.map(id, text)
+    override suspend fun <T> map(mapper: Joke.Mapper<T>): T = mapper.map(id, text)
 }

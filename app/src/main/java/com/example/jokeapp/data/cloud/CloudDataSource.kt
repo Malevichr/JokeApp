@@ -8,7 +8,7 @@ import java.net.ConnectException
 import java.net.UnknownHostException
 
 interface CloudDataSource : DataSource {
-    override fun fetch(): JokeResult
+    override suspend fun fetch(): JokeResult
     class Base(
         private val jokeService: JokeService,
         private val manageResources: ManageResources
@@ -20,7 +20,7 @@ interface CloudDataSource : DataSource {
             Error.ServiceUnavailable(manageResources)
         }
 
-        override fun fetch(): JokeResult =
+        override suspend fun fetch(): JokeResult =
             try {
                 val response = jokeService.joke().execute()
                 JokeResult.Success(response.body()!!, false)

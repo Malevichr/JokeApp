@@ -11,8 +11,8 @@ import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 
 interface CacheDataSource: DataSource {
-    fun addOrRemove(id: String, joke: Joke): JokeResult
-    override fun fetch(): JokeResult
+    suspend fun addOrRemove(id: String, joke: Joke): JokeResult
+    override suspend fun fetch(): JokeResult
     class Base(
         private val realmConfiguration: RealmConfiguration,
         manageResources: ManageResources
@@ -21,7 +21,7 @@ interface CacheDataSource: DataSource {
             Error.NoFavoriteJoke(manageResources)
         }
 
-        override fun addOrRemove(id: String, joke: Joke): JokeResult {
+        override suspend fun addOrRemove(id: String, joke: Joke): JokeResult {
             val realm = Realm.open(realmConfiguration)
 
 
@@ -33,15 +33,16 @@ interface CacheDataSource: DataSource {
                 realm.close()
                 JokeResult.Success(joke, false)
             } catch (_: Exception) {
+                val cacheJoke = joke.map(ToCache())
                 realm.writeBlocking {
-                    copyToRealm(joke.map(ToCache()))
+                    copyToRealm(cacheJoke)
                 }
                 realm.close()
                 JokeResult.Success(joke, true)
             }
         }
 
-        override fun fetch(): JokeResult {
+        override suspend fun fetch(): JokeResult {
             val realm = Realm.open(realmConfiguration)
             return try {
                 val jokesCached = realm.query<JokeCache>().find()
@@ -54,29 +55,29 @@ interface CacheDataSource: DataSource {
     }
 
 
-    class Fake(manageResources: ManageResources) : CacheDataSource {
-        private val error: Error by lazy {
-            Error.NoFavoriteJoke(manageResources)
-        }
-        private val map = mutableMapOf<String, Joke>()
-        override fun addOrRemove(id: String, joke: Joke): JokeResult {
-//            return if (map.containsKey(id)) {
-//                map.remove(id)
-//                joke.map(ToBaseUi())
-//            } else {
-//                map[id] = joke
-//                joke.map(ToFavoriteUi())
-//            }
-            TODO("not implemented")
-        }
-
-        override fun fetch(): JokeResult {
-            return if (map.isEmpty()) {
-                JokeResult.Failure(error)
-            } else
-                JokeResult.Success(map.toList()[(0 until (map.size)).random()].second, true)
-        }
-    }
+//    class Fake(manageResources: ManageResources) : CacheDataSource {
+//        private val error: Error by lazy {
+//            Error.NoFavoriteJoke(manageResources)
+//        }
+//        private val map = mutableMapOf<String, Joke>()
+//        override fun addOrRemove(id: String, joke: Joke): JokeResult {
+////            return if (map.containsKey(id)) {
+////                map.remove(id)
+////                joke.map(ToBaseUi())
+////            } else {
+////                map[id] = joke
+////                joke.map(ToFavoriteUi())
+////            }
+//            TODO("not implemented")
+//        }
+//
+//        override suspend fun fetch(): JokeResult {
+//            return if (map.isEmpty()) {
+//                JokeResult.Failure(error)
+//            } else
+//                JokeResult.Success(map.toList()[(0 until (map.size)).random()].second, true)
+//        }
+//    }
 }
 
 

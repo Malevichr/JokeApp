@@ -4,6 +4,9 @@ import com.example.jokeapp.data.cache.CacheDataSource
 import com.example.jokeapp.data.cloud.CloudDataSource
 import com.example.jokeapp.presentation.JokeUi
 import com.example.jokeapp.presentation.ManageResources
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.lang.Thread.sleep
 
 class BaseRepository(
     private val cloudDataSource: CloudDataSource,
@@ -12,7 +15,7 @@ class BaseRepository(
 ) : Repository<JokeUi, Error> {
     private var jokeTemrorary: Joke? = null
 
-    override fun fetch(): JokeResult {
+    override suspend fun fetch(): JokeResult {
         val jokeResult = if (getJokeFromCache)
             cacheDataSource.fetch()
         else
@@ -21,10 +24,11 @@ class BaseRepository(
             jokeResult
         } else
             null
+
         return jokeResult
     }
 
-    override fun changeJokeStatus(): JokeResult {
+    override suspend fun changeJokeStatus(): JokeResult {
         jokeTemrorary?.let {
             return it.map(Change(cacheDataSource))
         }
@@ -35,7 +39,4 @@ class BaseRepository(
     override fun chooseFavorites(favorite: Boolean) {
         getJokeFromCache = favorite
     }
-}
-interface DataSource{
-    fun fetch(): JokeResult
 }

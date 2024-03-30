@@ -1,6 +1,5 @@
 package com.example.jokeapp.data.cloud
 
-import android.text.BoringLayout
 import com.example.jokeapp.data.Joke
 import com.google.gson.annotations.SerializedName
 
@@ -21,6 +20,6 @@ data class JokeCloud(
     @SerializedName("value")
     private val text: String
 ) : Joke {
-    override fun <T> map(mapper: Joke.Mapper<T>): T = mapper.map(id, text)
+    override suspend fun <T> map(mapper: Joke.Mapper<T>): T = mapper.map(id, text)
 
 }
