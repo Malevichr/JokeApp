@@ -21,5 +21,4 @@ data class JokeCloud(
     private val text: String
 ) : Joke {
     override suspend fun <T> map(mapper: Joke.Mapper<T>): T = mapper.map(id, text)
-
 }

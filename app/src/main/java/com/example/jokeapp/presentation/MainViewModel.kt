@@ -3,33 +3,47 @@ package com.example.jokeapp.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jokeapp.data.Error
+import com.example.jokeapp.data.Joke
+import com.example.jokeapp.data.JokeResult
 import com.example.jokeapp.data.Repository
 import com.example.jokeapp.data.ToBaseUi
 import com.example.jokeapp.data.ToFavoriteUi
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
 class MainViewModel(
-    private val repository: Repository<JokeUi, Error>,
-    private val toFavorite: ToFavoriteUi = ToFavoriteUi(),
-    private val toBaseUi: ToBaseUi = ToBaseUi()
-):ViewModel() {
+    private val repository: Repository<JokeResult, Error>,
+    private val toFavorite: Joke.Mapper<JokeUi> = ToFavoriteUi(),
+    private val toBaseUi: Joke.Mapper<JokeUi>  = ToBaseUi(),
+    private val dispatcherList: DispatcherList = DispatcherList.Base()
+) : ViewModel() {
     private var jokeUiCallback: JokeUiCallback = JokeUiCallback.Empty()
     fun getJoke() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcherList.io()) {
             val result = repository.fetch()
-            val ui = if (result.isSuccessful()) {
-                if (result.isFavorite())
-                    result.map(toFavorite)
-                else
-                    result.map(toBaseUi)
-            } else {
+
+            val ui: JokeUi = if (result.isSuccessful())
+                result.map(if (result.isFavorite()) toFavorite else toBaseUi)
+            else
                 JokeUi.Failed(result.errorMessage())
-            }
-            withContext(Dispatchers.Main){
+
+            withContext(dispatcherList.ui()) {
                 ui.show(jokeUiCallback)
+            }
+        }
+    }
+
+    fun changeJokeStatus() {
+        viewModelScope.launch(dispatcherList.io()) {
+            val result = repository.changeJokeStatus()
+
+            val job = result.map(if (result.isFavorite()) toFavorite else toBaseUi)
+
+            withContext(dispatcherList.ui()) {
+                job.show(jokeUiCallback)
             }
         }
     }
@@ -42,22 +56,9 @@ class MainViewModel(
         super.onCleared()
         jokeUiCallback = JokeUiCallback.Empty()
     }
+
     fun chooseFavorites(favorites: Boolean) {
         repository.chooseFavorites(favorites)
-    }
-
-    fun changeJokeStatus() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.changeJokeStatus()
-            val job = if(result.isFavorite())
-                result.map(toFavorite)
-            else
-                result.map(toBaseUi)
-
-            withContext(Dispatchers.Main){
-                job.show(jokeUiCallback)
-            }
-        }
     }
 }
 
@@ -69,5 +70,14 @@ interface JokeUiCallback {
     class Empty : JokeUiCallback {
         override fun provideText(text: String) = Unit
         override fun provideIconResId(iconResId: Int) = Unit
+    }
+}
+
+interface DispatcherList {
+    fun io(): CoroutineDispatcher
+    fun ui(): CoroutineDispatcher
+    class Base:DispatcherList {
+        override fun io() = Dispatchers.IO
+        override fun ui() = Dispatchers.Main
     }
 }

@@ -32,6 +32,5 @@ interface CloudDataSource : DataSource {
                         serviceError
                 )
             }
-
     }
 }

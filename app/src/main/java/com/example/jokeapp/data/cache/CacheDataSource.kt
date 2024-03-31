@@ -10,7 +10,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 
-interface CacheDataSource: DataSource {
+interface CacheDataSource : DataSource {
     suspend fun addOrRemove(id: String, joke: Joke): JokeResult
     override suspend fun fetch(): JokeResult
     class Base(
@@ -23,20 +23,22 @@ interface CacheDataSource: DataSource {
 
         override suspend fun addOrRemove(id: String, joke: Joke): JokeResult {
             val realm = Realm.open(realmConfiguration)
-
-
             return try {
                 val jokeCache = realm.query<JokeCache>("id = $0", id).find().first()
+
                 realm.writeBlocking {
                     findLatest(jokeCache)?.also { delete(it) }
                 }
+
                 realm.close()
                 JokeResult.Success(joke, false)
             } catch (_: Exception) {
                 val cacheJoke = joke.map(ToCache())
+
                 realm.writeBlocking {
                     copyToRealm(cacheJoke)
                 }
+
                 realm.close()
                 JokeResult.Success(joke, true)
             }

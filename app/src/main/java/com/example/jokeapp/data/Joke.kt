@@ -49,5 +49,4 @@ class ToDomain : Joke.Mapper<JokeDomain> {
     override suspend fun map(id: String, text: String): JokeDomain {
         return JokeDomain(id, text)
     }
-
 }
