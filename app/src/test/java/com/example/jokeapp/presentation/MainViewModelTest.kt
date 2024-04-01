@@ -1,5 +1,6 @@
 package com.example.jokeapp.presentation
 
+import com.example.jokeapp.JokeApp
 import com.example.jokeapp.data.Error
 import com.example.jokeapp.data.Joke
 import com.example.jokeapp.data.JokeResult
@@ -20,6 +21,7 @@ class MainViewModelTest {
     private lateinit var toBaseMapper: Joke.Mapper<JokeUi>
     private lateinit var jokeUiCallback: FakeJokeUiCallback
     private lateinit var dispatcherList: DispatcherList
+    private lateinit var communication: FakeCommunication
 
     @Before
     fun setUp() {
@@ -28,9 +30,10 @@ class MainViewModelTest {
         toFavoriteMapper = FakeMapper(true)
         toBaseMapper = FakeMapper(false)
         jokeUiCallback = FakeJokeUiCallback()
+        communication = FakeCommunication()
 
-        viewModel = MainViewModel(repository, toFavorite = toFavoriteMapper, toBaseUi = toBaseMapper, dispatcherList = dispatcherList)
-        viewModel.init(jokeUiCallback)
+        viewModel = MainViewModel(repository, toFavorite = toFavoriteMapper, toBaseUi = toBaseMapper, communication, dispatcherList )
+
     }
 
     @Test
@@ -42,14 +45,10 @@ class MainViewModelTest {
             "error"
         )
         viewModel.getJoke()
-        val expectedText = "Joke"
-        val expectedIconId = 0
-        assertEquals(expectedText, jokeUiCallback.provideTextList[0])
-        assertEquals(expectedIconId, jokeUiCallback.provideIconResIdList[0])
 
+        val expectedJoke = FakeJokeUi("Joke", id="1", false)
 
-
-        assertEquals(1, jokeUiCallback.provideTextList.size)
+        assertEquals(expectedJoke, communication.data)
 
     }
     @Test
@@ -62,13 +61,9 @@ class MainViewModelTest {
         )
         viewModel.getJoke()
 
-        val expectedText = "Joke"
-        val expectedIconId = 1
+        val expectedJoke = FakeJokeUi("Joke", id="1", true)
 
-        assertEquals(expectedText, jokeUiCallback.provideTextList[0])
-        assertEquals(expectedIconId, jokeUiCallback.provideIconResIdList[0])
-
-        assertEquals(1, jokeUiCallback.provideTextList.size)
+        assertEquals(expectedJoke, communication.data)
     }
     @Test
     fun test_not_successful() {
@@ -83,10 +78,9 @@ class MainViewModelTest {
         val expectedText = "error"
         val expectedIconId = 0
 
-        assertEquals(expectedText, jokeUiCallback.provideTextList[0])
-        assertEquals(expectedIconId, jokeUiCallback.provideIconResIdList[0])
+        val expectedJoke = JokeUi.Failed("error")
 
-        assertEquals(1, jokeUiCallback.provideTextList.size)
+        assertEquals(expectedJoke, communication.data)
     }
     @Test
     fun test_change_joke_status(){
@@ -96,10 +90,9 @@ class MainViewModelTest {
         val expectedText = "Joke"
         val expectedIconId = 0
 
-        assertEquals(expectedText, jokeUiCallback.provideTextList[0])
-        assertEquals(expectedIconId, jokeUiCallback.provideIconResIdList[0])
+        val expectedJoke = FakeJokeUi("Joke", id="id", false)
 
-        assertEquals(1, jokeUiCallback.provideTextList.size)
+        assertEquals(expectedJoke, communication.data)
     }
 }
 private class FakeDispatcherList: DispatcherList{
@@ -130,7 +123,7 @@ private class FakeMapper(private val isFavorite: Boolean) : Joke.Mapper<JokeUi> 
 }
 
 private data class FakeJokeUi(val text: String, val id: String, val isFavorite: Boolean) :
-    JokeUi(text, if(isFavorite) 1 else 0)
+    JokeUi.Abstract(text, if(isFavorite) 1 else 0)
 
 private data class FakeJoke(
     private val id: String,
@@ -173,4 +166,11 @@ private class FakeRepository : Repository<JokeResult, Error> {
         TODO("Not yet implemented")
     }
 
+}
+
+private class FakeCommunication: JokeCommunication{
+    var data: JokeUi? = null
+    override fun map(data: JokeUi) {
+        this.data = data
+    }
 }

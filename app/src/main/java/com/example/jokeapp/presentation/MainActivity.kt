@@ -1,8 +1,8 @@
 package com.example.jokeapp.presentation
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.example.jokeapp.JokeApp
 import com.example.jokeapp.databinding.ActivityMainBinding
 
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar.visibility = View.VISIBLE
             viewModel.getJoke()
         }
-        viewModel.init(object: JokeUiCallback {
+        val jokeUiCallback = object: JokeUiCallback {
             override fun provideText(text: String)  {
                 binding.button.isEnabled = true
                 binding.progressBar.visibility = View.INVISIBLE
@@ -38,6 +38,9 @@ class MainActivity : AppCompatActivity() {
             override fun provideIconResId(iconResId: Int) {
                 binding.favoriteButton.setImageResource(iconResId)
             }
-        })
+        }
+        viewModel.observe(this){
+            it.show(jokeUiCallback)
+        }
     }
 }

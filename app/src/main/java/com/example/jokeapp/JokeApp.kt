@@ -7,6 +7,7 @@ import com.example.jokeapp.data.cache.CacheDataSource
 import com.example.jokeapp.data.cache.JokeCache
 import com.example.jokeapp.data.cloud.CloudDataSource
 import com.example.jokeapp.data.cloud.JokeService
+import com.example.jokeapp.presentation.JokeCommunication
 import com.example.jokeapp.presentation.MainViewModel
 import com.example.jokeapp.presentation.ManageResources
 import io.realm.kotlin.Realm
@@ -46,7 +47,8 @@ class JokeApp : Application() {
                 ),
                 CacheDataSource.Base(realmConfiguration, manageResources),
                 manageResources
-            )
+            ),
+            communication = JokeCommunication.Base()
         )
     }
 }
