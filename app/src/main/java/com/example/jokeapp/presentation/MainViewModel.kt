@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.jokeapp.data.Error
 import com.example.jokeapp.data.Joke
 import com.example.jokeapp.data.JokeResult
+import com.example.jokeapp.data.Language
 import com.example.jokeapp.data.Repository
 import com.example.jokeapp.data.ToBaseUi
 import com.example.jokeapp.data.ToFavoriteUi
@@ -22,6 +23,7 @@ class MainViewModel(
     private val communication: JokeCommunication,
     dispatcherList: DispatcherList = DispatcherList.Base()
 ) : BaseViewModel(dispatcherList), Observe<JokeUi> {
+
     fun getJoke() = handle(
         {
             val result = repository.fetch()
@@ -32,6 +34,9 @@ class MainViewModel(
         }
     ) {
         communication.map(it)
+    }
+    suspend fun changeLanguage(language: Language){
+        repository.changeLanguage(language)
     }
 
     fun changeJokeStatus() = handle(

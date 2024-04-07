@@ -7,23 +7,22 @@
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".presentation.MainActivity">
-
+    
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/languageMenu"
-        style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+        android:id="@+id/languageField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/langguage">
-
+        android:inputType="none"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu">
         <AutoCompleteTextView
-            android:id="@+id/languageView"
+            android:id="@+id/autoCompleteTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
-            android:text="@string/english"
-            app:simpleItems="@array/language_items" />
+            android:hint="@string/language"
+            app:simpleItems = "@array/language_items"
+            />
     </com.google.android.material.textfield.TextInputLayout>
-
 
     <TextView
         android:id="@+id/textView"
@@ -35,14 +34,14 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         tools:text="Some joke here"/>
 
-
     <ImageButton
         android:id="@+id/favoriteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:background="#0000"
-        tools:src="@drawable/ic_favorite_filled_48" />
+        tools:src="@drawable/ic_favorite_filled_48"
+        android:contentDescription="@string/nothing" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -64,6 +63,5 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:text="@string/get_joke" />
-
 
 </LinearLayout>

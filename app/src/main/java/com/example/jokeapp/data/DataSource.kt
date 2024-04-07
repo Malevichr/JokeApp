@@ -1,5 +1,5 @@
 package com.example.jokeapp.data
 
 interface DataSource{
-    suspend fun fetch(): JokeResult
+    suspend fun fetch(language: Language): JokeResult
 }

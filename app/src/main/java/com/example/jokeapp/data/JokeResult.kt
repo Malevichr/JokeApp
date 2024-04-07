@@ -6,7 +6,7 @@ interface  JokeResult : Joke{
     fun isFavorite(): Boolean
     fun isSuccessful(): Boolean
     fun errorMessage(): String
-    class Success(private val joke: Joke, private val toFavorite: Boolean) : JokeResult {
+    class Success(private val joke: Joke, private val toFavorite: Boolean, val language: Language) : JokeResult {
         override fun isFavorite(): Boolean = toFavorite
 
         override fun isSuccessful() = true

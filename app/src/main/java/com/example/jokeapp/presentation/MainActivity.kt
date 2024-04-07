@@ -15,11 +15,12 @@ class MainActivity : AppCompatActivity() {
 
         val viewModel = (application as JokeApp).viewModel
 
-        binding.showFavoriteCheckBox.setOnCheckedChangeListener{_, isChecked ->
+
+        binding.showFavoriteCheckBox.setOnCheckedChangeListener { _, isChecked ->
             viewModel.chooseFavorites(isChecked)
 
         }
-        binding.favoriteButton.setOnClickListener{
+        binding.favoriteButton.setOnClickListener {
             viewModel.changeJokeStatus()
         }
 
@@ -28,8 +29,8 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar.visibility = View.VISIBLE
             viewModel.getJoke()
         }
-        val jokeUiCallback = object: JokeUiCallback {
-            override fun provideText(text: String)  {
+        val jokeUiCallback = object : JokeUiCallback {
+            override fun provideText(text: String) {
                 binding.button.isEnabled = true
                 binding.progressBar.visibility = View.INVISIBLE
                 binding.textView.text = text
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                 binding.favoriteButton.setImageResource(iconResId)
             }
         }
-        viewModel.observe(this){
+        viewModel.observe(this) {
             it.show(jokeUiCallback)
         }
     }

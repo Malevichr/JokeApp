@@ -9,8 +9,8 @@ class BaseRepository(
     private val cacheDataSource: CacheDataSource,
     private val manageResources: ManageResources
 ) : Repository<JokeResult, Error> {
-    private var jokeTemporary: Joke? = null
-
+    private var jokeTemporally: Joke? = null
+    private var languageTemporally: Language = Language.Russian()
     private var getJokeFromCache = false
     override fun chooseFavorites(favorite: Boolean) {
         getJokeFromCache = favorite
@@ -20,9 +20,9 @@ class BaseRepository(
                 cacheDataSource
             else
                 cloudDataSource
-        val jokeResult = dataSource.fetch()
+        val jokeResult = dataSource.fetch(languageTemporally)
 
-        jokeTemporary = if(jokeResult.isSuccessful())
+        jokeTemporally = if(jokeResult.isSuccessful())
                 jokeResult
             else
                 null
@@ -30,10 +30,15 @@ class BaseRepository(
         return jokeResult
     }
 
+
     override suspend fun changeJokeStatus(): JokeResult {
-        jokeTemporary?.let {
+        jokeTemporally?.let {
             return it.map(Change(cacheDataSource))
         }
         return JokeResult.Failure(Error.NoFavoriteJoke(manageResources))
+    }
+
+    override suspend fun changeLanguage(language: Language): JokeResult {
+        TODO("Not yet implemented")
     }
 }

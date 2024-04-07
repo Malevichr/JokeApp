@@ -1,15 +1,12 @@
 package com.example.jokeapp.presentation
 
-import com.example.jokeapp.JokeApp
 import com.example.jokeapp.data.Error
 import com.example.jokeapp.data.Joke
 import com.example.jokeapp.data.JokeResult
 import com.example.jokeapp.data.Repository
 import junit.framework.Assert.assertEquals
-
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-
 import org.junit.Before
 import org.junit.Test
 
@@ -32,8 +29,7 @@ class MainViewModelTest {
         jokeUiCallback = FakeJokeUiCallback()
         communication = FakeCommunication()
 
-        viewModel = MainViewModel(repository, toFavorite = toFavoriteMapper, toBaseUi = toBaseMapper, communication, dispatcherList )
-
+        viewModel = MainViewModel(repository, toFavoriteMapper, toBaseMapper, communication, dispatcherList )
     }
 
     @Test
@@ -117,7 +113,7 @@ private class FakeJokeUiCallback: JokeUiCallback{
 }
 private class FakeMapper(private val isFavorite: Boolean) : Joke.Mapper<JokeUi> {
 
-    override suspend fun map(id: String, text: String): JokeUi {
+    override suspend fun map(id: String, text: String, language: String): JokeUi {
         return FakeJokeUi(text, id, isFavorite)
     }
 }
@@ -130,7 +126,7 @@ private data class FakeJoke(
     private val text: String
 ) : Joke {
     override suspend fun <T> map(mapper: Joke.Mapper<T>): T {
-        return mapper.map(id, text)
+        return mapper.map(id, text, "")
     }
 
 }
@@ -153,13 +149,17 @@ private data class FakeJokeResult(
 
 private class FakeRepository : Repository<JokeResult, Error> {
     var returnFetchJokeResult: JokeResult? = null
-    override suspend fun fetch(): JokeResult {
+    override suspend fun fetch(language: String): JokeResult {
         return returnFetchJokeResult!!
     }
     var returnChaneJokeStatus: FakeJokeResult? = null
     override suspend fun changeJokeStatus(): JokeResult {
         returnChaneJokeStatus!!.isFavorites = !(returnChaneJokeStatus!!.isFavorites)
         return returnChaneJokeStatus!!
+    }
+
+    override suspend fun changeLanguage(): JokeResult {
+        TODO("Not yet implemented")
     }
 
     override fun chooseFavorites(favorite: Boolean) {

@@ -7,6 +7,7 @@ import com.example.jokeapp.data.cache.CacheDataSource
 import com.example.jokeapp.data.cache.JokeCache
 import com.example.jokeapp.data.cloud.CloudDataSource
 import com.example.jokeapp.data.cloud.JokeService
+import com.example.jokeapp.data.cloud.TranslateService
 import com.example.jokeapp.presentation.JokeCommunication
 import com.example.jokeapp.presentation.MainViewModel
 import com.example.jokeapp.presentation.ManageResources
@@ -15,6 +16,7 @@ import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.ext.query
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 
 
 class JokeApp : Application() {
@@ -22,10 +24,16 @@ class JokeApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val retrofit = Retrofit.Builder()
+        val retrofitJoke = Retrofit.Builder()
             .baseUrl("https://api.chucknorris.io/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+
+        val retrofitTranslate = Retrofit.Builder()
+            .baseUrl("https://translate.api.cloud.yandex.net")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
         val manageResources = ManageResources.Base(this)
 
         val realmConfiguration = RealmConfiguration.create(schema = setOf(JokeCache::class))
@@ -42,7 +50,8 @@ class JokeApp : Application() {
         viewModel = MainViewModel(
             BaseRepository(
                 CloudDataSource.Base(
-                    retrofit.create(JokeService::class.java),
+                    retrofitJoke.create(JokeService::class.java),
+                    retrofitTranslate.create(TranslateService::class.java),
                     manageResources
                 ),
                 CacheDataSource.Base(realmConfiguration, manageResources),

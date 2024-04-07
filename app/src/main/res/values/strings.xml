@@ -3,10 +3,11 @@
     <string name="get_joke">GET JOKE</string>
     <string name="no_connection_message">No internet connection</string>
     <string name="service_unavailable_massage">Service is unavailable</string>
-    <string name="langguage">Language</string>
+    <string name="language">Language</string>
     <string name="english">English</string>
     <string name="russian">Russian</string>
     <string name="chuvash">Chuvash</string>
     <string name="from_favorites">From favorites</string>
     <string name="no_favorite_jokes">No favorite jokes.</string>
+    <string name="nothing" />
 </resources>
